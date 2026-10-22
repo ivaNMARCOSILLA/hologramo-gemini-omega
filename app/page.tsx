@@ -344,9 +344,12 @@ export default function Home() {
               // Windows sigue pidiendo permiso en el PC. Se ignora lo que OMEGA dice en voz alta (eco).
               if (!window.speechSynthesis?.speaking) {
                 const said = transcript.replace(/[.,;:!?¡¿]+$/g, '').trim();
-                const auto = routeOmegaCommand(said);
+                // OMEGA_CODIGO_VOZ_V1: el mismo dictado sirve para programar (motor OpenRouter).
+                const codeReq = /^(?:omega\s+)?(?:programa|genera|crea|escribe|hazme|haz)\b.*\b(?:c[oó]digo|script|funci[oó]n|componente|programa|p[aá]gina|html|css|python|javascript|typescript|sql)\b/i.test(said);
+                if (codeReq) window.dispatchEvent(new CustomEvent('omega:code-generate', { detail: said }));
+                const auto = codeReq ? null : routeOmegaCommand(said);
                 if (auto) window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction: auto, via:'voice' } }));
-                else window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: 'No reconozco «' + said.slice(0, 80) + '». Sigo escuchando. Di «ayuda» o «cancelar».' }));
+                else if (!codeReq) window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: 'No reconozco «' + said.slice(0, 80) + '». Sigo escuchando. Di «ayuda» o «cancelar».' }));
               }
             } else if (windowsDictationRef.current) {
               windowsDictationRef.current = false;

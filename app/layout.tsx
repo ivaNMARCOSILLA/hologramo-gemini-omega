@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./omega-a11y.css";
 import "./omega-futurista.css";
+import "./omega-code-engine.css";
 import "./omega-central-jump.css";
 import OmegaA11yRoot from "../components/OmegaA11yRoot";
 

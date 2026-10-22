@@ -12,6 +12,7 @@ import { routeOmegaIntent } from "@/lib/omega-router-v05";
 import type { OmegaPlan } from "@/lib/omega-router-v05";
 import catalogue from "@/data/omega-recetas-v05.json";
 import { routeVoiceShortcut, type OmegaAVCommand } from "@/lib/omega-av-v07";
+import { sendRemoteWindowsOrder } from "@/lib/omega-voz-dictadora"; // OMEGA_VOZ_REMOTA_V1
 import { routeOmegaCommand, OMEGA_VOICE_EXAMPLES, type OmegaCommand } from "@/lib/omega-command-v11"; // OMEGA_VOICE_TOTAL_V11
 import OmegaV09CommandStrip from "@/components/OmegaV09CommandStrip";
 import OmegaV09Account from "@/components/OmegaV09Account";
@@ -243,9 +244,16 @@ export default function OmegaUnifiedPanel({
       return false;
     }
     if (localhost !== true) {
-      setFeedback('Windows solo se controla desde esta instalacion local, no desde la web publica.');
-      return false;
-    }
+        // OMEGA_VOZ_REMOTA_V1: en la web pública, la orden va a la cola segura del puente (consentimiento local en el PC).
+        windowsVoiceBusy.current = true;
+        try {
+          return await sendRemoteWindowsOrder(text, (msg) => {
+            setFeedback(msg);
+            setAvMessage(msg);
+            window.dispatchEvent(new CustomEvent("omega:voice-summary", { detail: msg }));
+          });
+        } finally { windowsVoiceBusy.current = false; }
+      }
     windowsVoiceBusy.current = true;
     setLoading(true);
     setFeedback(safeAuto ? 'Abriendo aplicación segura en Windows sin aviso adicional…' : 'Confirma la solicitud en la ventana nativa de Windows. Comprobando que la aplicacion aparezca en el escritorio...');

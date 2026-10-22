@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import HologramScene from "@/components/HologramScene";
 import OmegaUnifiedPanel from "@/components/OmegaUnifiedPanel";
 import { routeOmegaCommand } from "@/lib/omega-command-v11"; // OMEGA_VOICE_TOTAL_V11
+import { omegaLocalAnswer } from "@/lib/omega-voz-dictadora"; // OMEGA_VOZ_LOCAL_V1
 import { routeVoiceShortcut } from "@/lib/omega-av-v07"; // OMEGA_VOZ_DICTADORA_V1
 import "./omega-v05.css";
 import "./omega-v09.css";
@@ -266,6 +267,15 @@ export default function Home() {
     try { recognitionRef.current?.stop(); } catch {}
     setMicStatus('idle');
     setLastUserVoice(clean);
+    // OMEGA_VOZ_LOCAL_V1: preguntas sencillas se responden sin IA.
+    const localReply = omegaLocalAnswer(clean);
+    if (localReply) {
+      processingRef.current = false;
+      setOmegaResponse(localReply);
+      window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: localReply }));
+      speakVoice(localReply);
+      return;
+    }
     setIsProcessing(true);
     setOmegaResponse('DESCIFRANDO LA SEÑAL NEURAL…');
     window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: 'Procesando tu petición: ' + clean.slice(0, 150) }));
@@ -281,8 +291,8 @@ export default function Home() {
       window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: 'Respuesta: ' + reply.slice(0, 280) }));
       setEmotion(classifyEmotion(reply));
       speakVoice(reply);
-    } catch {
-      const fallback = 'No he podido conectar con el núcleo de inteligencia. Comprueba la conexión y vuelve a intentarlo.';
+    } catch (err) {
+      const fallback = /API 40[13]/.test(String(err)) ? 'Esa orden no la reconozco, y la IA solo responde al administrador con sesión iniciada. Di «ayuda» para oír las órdenes disponibles.' : 'No he podido conectar con el núcleo de inteligencia. Comprueba la conexión y vuelve a intentarlo.';
       setOmegaResponse(fallback);
       window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: fallback }));
       setEmotion('alert');

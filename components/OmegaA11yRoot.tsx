@@ -3,6 +3,7 @@ import { useEffect, useState, type MouseEvent as ReactMouseEvent } from "react";
 import OmegaAccessibleMenu from "./OmegaAccessibleMenu";
 import OmegaSupervisor from "./OmegaSupervisor";
 import OmegaCodeEngine from "./OmegaCodeEngine";
+import OmegaDiagnostics from "./OmegaDiagnostics";
 import OmegaVoiceAlwaysOn from "./OmegaVoiceAlwaysOn";
 import { loadPrefs, ownUtterances, vibrate, type FeedbackKind } from "../lib/omega-a11y-feedback";
 
@@ -106,6 +107,7 @@ export default function OmegaA11yRoot() {
       </div>
       <OmegaSupervisor />
       <OmegaCodeEngine />
+      <OmegaDiagnostics />
       <OmegaVoiceAlwaysOn />
     </>
   );

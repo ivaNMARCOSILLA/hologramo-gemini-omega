@@ -1,0 +1,76 @@
+/* OMEGA_CENTRAL_JUMP_V1 - "IR A SECCIÓN" holográfico.
+   Solo estilo: mismo texto, mismo <select>, mismas secciones y misma posición en la barra superior. */
+.ou-wrap .ou-central-jump {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 6px 6px 6px 14px; border-radius: 999px;
+  font-size: 10px; font-weight: 750; letter-spacing: .22em; color: #8ff3f7;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#061423, #061423) padding-box,
+    linear-gradient(120deg, #00e5ff, #8a5cff 55%, #ff3df2) border-box;
+  box-shadow: 0 0 18px rgba(0, 229, 255, .28), 0 0 42px rgba(138, 92, 255, .14), inset 0 0 14px rgba(0, 229, 255, .08);
+  text-shadow: 0 0 8px rgba(0, 229, 255, .65);
+  white-space: nowrap;
+}
+.ou-wrap .ou-central-jump::before {
+  content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%;
+  background: #00e5ff; box-shadow: 0 0 10px #00e5ff, 0 0 20px rgba(0, 229, 255, .6);
+  animation: ou-jump-pulse 2.4s ease-in-out infinite;
+}
+@keyframes ou-jump-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.75); } }
+
+.ou-wrap .ou-central-jump select {
+  appearance: none; -webkit-appearance: none;
+  min-width: 170px; min-height: 36px; padding: 0 38px 0 14px; border-radius: 999px;
+  font: 600 13px/1 system-ui, "Segoe UI", sans-serif; letter-spacing: .04em; color: #eafdff;
+  text-shadow: none; cursor: pointer;
+  border: 1px solid rgba(0, 229, 255, .55);
+  background-color: #0b2436;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(0, 229, 255, .16), rgba(138, 92, 255, .12));
+  background-repeat: no-repeat; background-position: right 14px center, 0 0; background-size: 12px 12px, 100% 100%;
+  box-shadow: inset 0 0 12px rgba(0, 229, 255, .16);
+  transition: border-color .2s, box-shadow .2s;
+}
+.ou-wrap .ou-central-jump select:hover,
+.ou-wrap .ou-central-jump select:focus-visible {
+  border-color: #ff3df2;
+  box-shadow: inset 0 0 14px rgba(255, 61, 242, .18), 0 0 16px rgba(255, 61, 242, .45), 0 0 30px rgba(0, 229, 255, .3);
+}
+.ou-wrap .ou-central-jump select option { background: #061423; color: #eafdff; }
+
+/* Móvil: misma posición, algo más compacto */
+@media (max-width: 760px) {
+  .ou-wrap .ou-central-jump { gap: 8px; padding-left: 10px; font-size: 9px; letter-spacing: .14em; }
+  .ou-wrap .ou-central-jump select { min-width: 130px; font-size: 12px; }
+}
+
+/* Tema claro */
+.ou-wrap[data-omega-theme="claro"] .ou-central-jump {
+  color: #0a2334; text-shadow: none;
+  background: linear-gradient(#f5fbfd, #f5fbfd) padding-box, linear-gradient(120deg, #0091a8, #5b3cc4) border-box;
+  box-shadow: none;
+}
+
+/* Alto contraste (tema o preferencia de accesibilidad) */
+.ou-wrap[data-omega-theme="contraste"] .ou-central-jump,
+html[data-omega-contrast="alto"] .ou-wrap .ou-central-jump {
+  color: #fff; text-shadow: none; box-shadow: none; background: #000; border: 2px solid #fff;
+}
+.ou-wrap[data-omega-theme="contraste"] .ou-central-jump select,
+html[data-omega-contrast="alto"] .ou-wrap .ou-central-jump select {
+  color: #fff; background-color: #000; background-image: none; padding-right: 14px;
+  border: 2px solid #ffd400; box-shadow: none; appearance: auto; -webkit-appearance: menulist;
+}
+.ou-wrap[data-omega-theme="contraste"] .ou-central-jump::before,
+html[data-omega-contrast="alto"] .ou-wrap .ou-central-jump::before { background: #ffd400; box-shadow: none; animation: none; }
+
+/* Movimiento reducido y colores forzados */
+html[data-omega-motion="reducido"] .ou-wrap .ou-central-jump::before { animation: none; }
+@media (prefers-reduced-motion: reduce) { .ou-wrap .ou-central-jump::before { animation: none; } .ou-wrap .ou-central-jump select { transition: none; } }
+@media (forced-colors: active) {
+  .ou-wrap .ou-central-jump { border: 1px solid CanvasText; background: Canvas; }
+  .ou-wrap .ou-central-jump::before { display: none; }
+  .ou-wrap .ou-central-jump select { appearance: auto; background-image: none; border: 1px solid CanvasText; }
+}

@@ -25,13 +25,17 @@ test('el panel comparte un único microfono y la escena se conserva', () => {
   const panel = readFileSync(join(process.cwd(), 'components/OmegaUnifiedPanel.tsx'), 'utf8');
   assert.equal((page.match(/new Recognition\(\)/g) || []).length,1);
   assert.match(page,/HologramScene/);
-  assert.match(page,/omega:av-command/);
+  // v1.1: 'omega:av-command' (v0.7) quedó sin emisor; navegación e ideas van por 'omega:unified-command'.
+  assert.match(page,/dispatchEvent\(new CustomEvent\(\s*['"]omega:unified-command/); // emisor (voz)
+  assert.match(panel,/addEventListener\(\s*['"]omega:unified-command['"]/); // receptor
+  assert.match(page,/routeOmegaCommand\(/); // intérprete único v1.1
   assert.match(panel,/omega:voice-editor/);
   assert.match(panel,/omega:v07:ideas/);
 });
 test('las rutas de Windows y pago siguen restringidas', () => {
   const win=readFileSync(join(process.cwd(),'app/api/omega-windows/route.ts'),'utf8');
   const mkt=readFileSync(join(process.cwd(),'app/api/omega-market/route.ts'),'utf8');
-  assert.match(win,/allowedLocalRequest/);
-  assert.match(mkt,/permittedMarketRequest/);
+  assert.match(win,/sameOrigin\(req\)/);
+  assert.match(win,/verified\(req\)/);
+  assert.match(mkt,/\b410\b/); // ruta retirada a propósito
 });

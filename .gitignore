@@ -85,3 +85,9 @@ omega-operator-v*/diagnosticos/
 Nueva carpeta/PARTES/parte_022.txt
 OMEGA-v09-ENV-EJEMPLO.txt
 Nueva carpeta/PARTES/parte_001.txt
+
+# Secretos y dependencias
+.env
+.env.*
+!.env.example
+node_modules/

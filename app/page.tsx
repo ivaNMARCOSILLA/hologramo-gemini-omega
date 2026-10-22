@@ -339,6 +339,15 @@ export default function Home() {
             } else if (codeDictationRef.current) {
               codeDictationRef.current = false;
               window.dispatchEvent(new CustomEvent('omega:voice-code', { detail: transcript }));
+            } else if (windowsDictationRef.current && (() => { try { return window.localStorage.getItem('omega:dictado-continuo') !== 'false'; } catch { return true; } })()) {
+              // OMEGA_DICTADO_CONTINUO_V1: dictado siempre encendido y automático (sin "Enviar orden" ni revisión).
+              // Windows sigue pidiendo permiso en el PC. Se ignora lo que OMEGA dice en voz alta (eco).
+              if (!window.speechSynthesis?.speaking) {
+                const said = transcript.replace(/[.,;:!?¡¿]+$/g, '').trim();
+                const auto = routeOmegaCommand(said);
+                if (auto) window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction: auto, via:'voice' } }));
+                else window.dispatchEvent(new CustomEvent('omega:av-feedback', { detail: 'No reconozco «' + said.slice(0, 80) + '». Sigo escuchando. Di «ayuda» o «cancelar».' }));
+              }
             } else if (windowsDictationRef.current) {
               windowsDictationRef.current = false;
               // OMEGA_RUTA_VOZ_V1: si lo dictado no es una orden de Windows (navegar, idea, editor...), va al intérprete general.
@@ -375,6 +384,10 @@ export default function Home() {
       } else setMicStatus('idle');
     };
     recognition.onend = () => {
+      // OMEGA_DICTADO_CONTINUO_V1: reanudar la escucha si el dictado continuo sigue activo.
+      if (windowsDictationRef.current && !processingRef.current) {
+        window.setTimeout(() => { try { recognition.start(); } catch { /* ya está escuchando */ } }, 300);
+      }
       setMicStatus(prev => prev === 'blocked' ? prev : 'idle');
       if (conversationRef.current && !processingRef.current && !speakingNowRef.current) {
         restartTimerRef.current = setTimeout(restartListening, 650);

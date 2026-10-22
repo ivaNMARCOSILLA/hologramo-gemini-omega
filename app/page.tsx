@@ -335,11 +335,17 @@ export default function Home() {
               window.dispatchEvent(new CustomEvent('omega:voice-code', { detail: transcript }));
             } else if (windowsDictationRef.current) {
               windowsDictationRef.current = false;
-              window.dispatchEvent(new CustomEvent('omega:voice-order', { detail: transcript }));
+              // OMEGA_RUTA_VOZ_V1: si lo dictado no es una orden de Windows (navegar, idea, editor...), va al intérprete general.
+              const dictated = routeOmegaCommand(transcript.replace(/[.,;:!?¡¿]+$/g, "").trim()) as { kind?: unknown } | null;
+              if (dictated && !String(dictated.kind ?? '').startsWith('windows')) {
+                window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction: dictated, via:'voice' } }));
+              } else {
+                window.dispatchEvent(new CustomEvent('omega:voice-order', { detail: transcript }));
+              }
             } else {
               // OMEGA_VOZ_DICTADORA_V1: la voz manda. 1) intérprete v1.1; 2) si no reconoce la orden,
               // atajo v0.7 (abrir sección / guardar idea, con confirmación hablada); 3) solo entonces, la IA.
-              const routed = routeOmegaCommand(transcript);
+              const routed = routeOmegaCommand(transcript.replace(/[.,;:!?¡¿]+$/g, "").trim());
               const shortcut = routed ? null : routeVoiceShortcut(transcript);
               if (shortcut) {
                 window.dispatchEvent(new CustomEvent('omega:av-command', { detail: shortcut }));

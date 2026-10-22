@@ -1,0 +1,42 @@
+{
+  "name": "holograma-gemini",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "agent:windows": "node omega-agent-v0.3/bridge.mjs",
+    "omega:voice:on": "node omega-agent-v0.3/sesion-voz.mjs on",
+    "omega:voice:off": "node omega-agent-v0.3/sesion-voz.mjs off",
+    "omega:voice:status": "node omega-agent-v0.3/sesion-voz.mjs status"
+  },
+  "dependencies": {
+    "@google/genai": "^2.30.0",
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/hands": "^0.4.1675469240",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@types/three": "^0.186.0",
+    "groq-sdk": "^1.6.0",
+    "lucide-react": "^1.59.0",
+    "next": "16.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

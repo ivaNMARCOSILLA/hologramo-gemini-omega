@@ -1,0 +1,12 @@
+{
+    "allowAutomaticElevation":  false,
+    "mouseControl":  false,
+    "version":  "2.0-preparacion",
+    "voiceCommands":  true,
+    "keyboardControl":  false,
+    "allowRemoteShell":  false,
+    "localConsentForSensitiveActions":  true,
+    "status":  "pendiente-de-integracion",
+    "desktopVision":  false,
+    "requireAdminMfa":  true
+}

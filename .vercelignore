@@ -1,0 +1,40 @@
+
+# OMEGA VERCEL RC v1.2: archivos privados NO publicables
+.omega-backups/
+omega-local-data/
+omega-agent-v0.3/
+omega-agent-node/
+omega-windows-agent/
+omega-windows-agent-node-v0.1/
+omega-agent-v0.2/
+.env*
+*.zip
+*.bak
+*.backup-*
+*.log
+*.pem
+*.tsbuildinfo
+.agent-token
+node_modules/
+.next/
+.vercel/
+omega-agent-v0.3/.omega-bridge-secret
+omega-agent-v0.3/.agent-token
+omega-agent-v0.3/.omega-trusted-session.json
+
+# OMEGA secretos y locales
+.env*.local
+.env.local.backup*
+omega-agent-v0.3/.omega-bridge.lock
+omega-agent-v0.3/logs/
+.venv-whisper/
+
+# OMEGA volcados, respaldos y archivos con claves
+Nueva carpeta/
+*proyecto_completo*.txt
+omega-operator-v*/respaldos/
+omega-operator-v*/diagnosticos/
+!*.example
+Nueva carpeta/PARTES/parte_022.txt
+OMEGA-v09-ENV-EJEMPLO.txt
+Nueva carpeta/PARTES/parte_001.txt

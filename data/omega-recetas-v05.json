@@ -1,0 +1,35 @@
+{
+  "schema": "omega.recipe.catalogue.v0.5-draft",
+  "status": "PROPUESTA_SIN_EJECUCION",
+  "defaultPolicy": "deny",
+  "modelUsed": "none_for_known_intents",
+  "note": "Catalogo declarativo. No permite shell, PowerShell, rutas arbitrarias, scripts ni validaciones UAC automaticas.",
+  "permissionLevels": {
+    "read": "Lectura de informacion no sensible; mostrar resultado.",
+    "confirm_each": "Confirmacion humana vinculada a operacion y contexto especificos.",
+    "browser_gesture": "Requiere gesto o permiso explicito del navegador.",
+    "human_only": "Exige accion humana externa. Sin delegacion a IA."
+  },
+  "recipes": [
+    {"id":"APP-CALC-01","intent":"open_calculator","category":"applications","risk":"low","permission":"confirm_each","executor":"agent.allowlisted_app","arguments":{"app":"calculator"},"verify":"process_or_window_exists","windows":"7-11","rollback":"close_window_on_request"},
+    {"id":"APP-NOTE-02","intent":"open_notepad","category":"applications","risk":"low","permission":"confirm_each","executor":"agent.allowlisted_app","arguments":{"app":"notepad"},"verify":"process_or_window_exists","windows":"7-11","rollback":"close_window_on_request"},
+    {"id":"APP-EXP-03","intent":"open_explorer","category":"applications","risk":"low","permission":"confirm_each","executor":"agent.allowlisted_app","arguments":{"app":"explorer"},"verify":"window_exists","windows":"7-11","rollback":"close_window_on_request"},
+    {"id":"SYS-READ-01","intent":"diagnose_system","category":"diagnostics","risk":"read","permission":"read","executor":"agent.system_info","arguments":{},"verify":"os_version_cpu_memory_present","windows":"7-11","rollback":"none"},
+    {"id":"SYS-PROC-02","intent":"list_processes","category":"diagnostics","risk":"read","permission":"read","executor":"agent.list_processes_safe","arguments":{},"verify":"process_list_returned","windows":"10-11","rollback":"none"},
+    {"id":"SYS-DISK-03","intent":"disk_health","category":"diagnostics","risk":"read","permission":"read","executor":"agent.disk_space","arguments":{},"verify":"free_space_returned","windows":"10-11","rollback":"none"},
+    {"id":"SYS-NET-04","intent":"network_status","category":"diagnostics","risk":"read","permission":"read","executor":"agent.network_status_redacted","arguments":{},"verify":"connection_state_returned","windows":"10-11","rollback":"none"},
+    {"id":"SYS-AUDIO-05","intent":"audio_devices","category":"diagnostics","risk":"read","permission":"read","executor":"agent.audio_inventory","arguments":{},"verify":"device_inventory_returned","windows":"10-11","rollback":"none"},
+    {"id":"WIN-LIST-06","intent":"list_windows","category":"desktop","risk":"read","permission":"read","executor":"agent.ui_automation_list","arguments":{},"verify":"windows_detected","windows":"10-11","rollback":"none"},
+    {"id":"WIN-FOCUS-07","intent":"focus_window","category":"desktop","risk":"medium","permission":"confirm_each","executor":"agent.ui_automation_focus","arguments":{"target":"selected_window_only"},"verify":"foreground_matches","windows":"10-11","rollback":"previous_focus"},
+    {"id":"WIN-MIN-08","intent":"minimize_window","category":"desktop","risk":"medium","permission":"confirm_each","executor":"agent.ui_automation_minimize","arguments":{"target":"selected_window_only"},"verify":"window_minimized","windows":"10-11","rollback":"restore_window"},
+    {"id":"DOC-SEARCH-09","intent":"find_document","category":"files","risk":"read","permission":"confirm_each","executor":"agent.search_user_selected_folder","arguments":{"folder":"must_be_selected_by_user","pattern":"safe_basename_only"},"verify":"results_match_scope","windows":"10-11","rollback":"none"},
+    {"id":"CLIP-10","intent":"copy_text","category":"clipboard","risk":"privacy","permission":"browser_gesture","executor":"web.clipboard_write","arguments":{"text":"user_selection_only"},"verify":"browser_success","windows":"browser_supported","rollback":"not_applicable"},
+    {"id":"CLIP-11","intent":"paste_text","category":"clipboard","risk":"privacy","permission":"browser_gesture","executor":"web.clipboard_read","arguments":{"destination":"focused_input_only"},"verify":"text_visible_to_user","windows":"browser_supported","rollback":"undo_edit"},
+    {"id":"VOICE-12","intent":"dictate_text","category":"voice","risk":"privacy","permission":"browser_gesture","executor":"web.speech_recognition","arguments":{"language":"es-ES","microphone":"on_click_only"},"verify":"user_reviews_transcript","windows":"browser_supported","rollback":"erase_draft"},
+    {"id":"SIGN-VIS-13","intent":"draw_signature","category":"documents","risk":"medium","permission":"browser_gesture","executor":"web.signature_canvas","arguments":{"export":"png","legal_status":"not_certified"},"verify":"manual_review","windows":"browser_supported","rollback":"clear_canvas"},
+    {"id":"SIGN-LEGAL-14","intent":"qualified_signature","category":"documents","risk":"high","permission":"human_only","executor":"external_trust_service","arguments":{"provider":"user_chosen","identity":"human_controlled"},"verify":"certificate_validation","windows":"provider_dependent","rollback":"not_applicable"},
+    {"id":"NOTICE-INFO-15","intent":"dismiss_information","category":"notifications","risk":"low","permission":"read","executor":"omega.internal_notice_ack","arguments":{"severity":"info","explicit_opt_in":true},"verify":"notice_acknowledged","windows":"all","rollback":"reopen_from_history"},
+    {"id":"NOTICE-UAC-16","intent":"uac_elevation","category":"notifications","risk":"critical","permission":"human_only","executor":"human_on_windows_secure_desktop","arguments":{},"verify":"os_reports_result","windows":"vista-11","rollback":"not_applicable"},
+    {"id":"FILE-DELETE-17","intent":"delete_files","category":"files","risk":"high","permission":"human_only","executor":"NOT_IMPLEMENTED","arguments":{},"verify":"not_applicable","windows":"not_approved","rollback":"not_available"}
+  ]
+}

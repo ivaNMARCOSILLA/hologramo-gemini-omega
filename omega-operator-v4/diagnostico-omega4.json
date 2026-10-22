@@ -1,0 +1,16 @@
+{
+  "version": "4.0",
+  "updated_at": "2026-10-22T01:17:16",
+  "stats": {
+    "recordings": 3,
+    "transcribed": 3,
+    "executed": 1,
+    "unrecognized": 2,
+    "errors": 0,
+    "corrected": 0,
+    "auto_learned": 0
+  },
+  "memory_aliases": 0,
+  "model": "small",
+  "seconds": 10
+}

@@ -1,0 +1,8 @@
+OMEGA PERSONAL - ACTA DE INSTALACION
+Operador local: SUPERADAS
+Sitio web: REVISAR - OTRAS RUTAS DE COBRO EN CODIGO; NO PUBLICAR
+Produccion: NO PUBLICADO
+Backups: C:\Users\ivanm\Desktop\OMEGA-256D-HYPERSPACE\Obj4K9D\holograma-gemini\omega-operator-v6\respaldos\20261022-015413
+Diagnostico: C:\Users\ivanm\Desktop\OMEGA-256D-HYPERSPACE\Obj4K9D\holograma-gemini\omega-operator-v6\diagnosticos\CIERRE-OMEGA-PERSONAL.json
+NOTA: No se cancelan pagos externos ni se suprime MFA.
+NOTA: Cuenta personal no equivale a una autorizacion servidor-side exclusiva hasta configurar Supabase Auth y permisos.

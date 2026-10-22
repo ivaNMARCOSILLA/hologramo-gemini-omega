@@ -1,0 +1,78 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const ts = require('typescript');
+const path = join(process.cwd(), 'app/api/omega-market/route.ts');
+const code = readFileSync(path, 'utf8');
+const libCode = readFileSync(join(process.cwd(), 'lib/omega-market-v06.ts'), 'utf8');
+const transpile = text => ts.transpileModule(text, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+const tmp = mkdtempSync(join(tmpdir(), 'omega-market-test-'));
+const fakeProcess = { env: { NODE_ENV: 'development', OMEGA_MARKET_ENABLED: 'false', OPENROUTER_API_KEY: '' }, cwd: () => tmp };
+function load(code, loader) {
+  const mod = { exports: {} };
+  const exec = new Function('require', 'module', 'exports', 'process', 'fetch', code);
+  exec(loader, mod, mod.exports, fakeProcess, fakeFetch);
+  return mod.exports;
+}
+let calls = 0;
+async function fakeFetch() {
+  calls++;
+  return Response.json({ choices: [{ message: { content: 'Plan seguro de prueba' } }], usage: { prompt_tokens: 100, completion_tokens: 20, cost: 0.001 } });
+}
+const lib = load(transpile(libCode), require);
+const route = load(transpile(code), name => name === '@/lib/omega-market-v06' ? lib : require(name));
+const headers = { 'host': '127.0.0.1:3000', 'origin': 'http://127.0.0.1:3000', 'sec-fetch-site': 'same-origin', 'content-type': 'application/json' };
+const post = (body, changedHeaders = {}) => new Request('http://127.0.0.1:3000/api/omega-market', { method: 'POST', headers: { ...headers, ...changedHeaders }, body: JSON.stringify(body) });
+const req = (extra = {}) => ({ approval: 'consult_paid_ai', model: 'anthropic/claude-sonnet-4.6', purpose: 'windows_plan', prompt: 'Propón un plan seguro de Windows.', ...extra });
+
+test('la instalación desactivada no realiza peticiones de pago', async () => {
+  const r = await route.POST(post(req()));
+  assert.equal(r.status, 503);
+  assert.equal(calls, 0);
+});
+test('GET de estado no devuelve ninguna credencial', async () => {
+  const r = await route.GET(new Request('http://127.0.0.1:3000/api/omega-market', { headers }));
+  const data = await r.json();
+  assert.equal(r.status, 200);
+  assert.equal(data.enabled, false);
+  assert.equal(JSON.stringify(data).includes('sk-or-'), false);
+});
+test('autorización obligatoria, incluso cuando hay clave', async () => {
+  fakeProcess.env.OPENROUTER_API_KEY = 'sk-or-v1-prueba-no-es-una-llave-real';
+  fakeProcess.env.OMEGA_MARKET_ENABLED = 'true';
+  const r = await route.POST(post(req({ approval: 'no' })));
+  assert.equal(r.status, 403);
+  assert.equal(calls, 0);
+});
+test('origen externo rechazado sin llamada al modelo', async () => {
+  const r = await route.POST(post(req(), { origin: 'https://sitio-externo.example' }));
+  assert.equal(r.status, 403);
+  assert.equal(calls, 0);
+});
+test('sólo el modelo permitido obtiene una respuesta; gasto guardado localmente', async () => {
+  const invalid = await route.POST(post(req({ model: 'rogue/unknown' })));
+  assert.equal(invalid.status, 400);
+  assert.equal(calls, 0);
+  const valid = await route.POST(post(req()));
+  const body = await valid.json();
+  assert.equal(valid.status, 200);
+  assert.equal(body.reply, 'Plan seguro de prueba');
+  assert.equal(body.estimatedCostUSD, 0.001);
+  assert.equal(calls, 1);
+});
+test('modo código premium requiere autorización y mantiene los límites de gasto', async () => {
+  const ok = await route.POST(post(req({ purpose: 'code', prompt: 'Genera un ejemplo PowerShell con Get-Process' })));
+  assert.equal(ok.status, 200);
+  assert.equal(calls, 2);
+});
+test('producción cerrada aunque exista clave de proveedor', async () => {
+  fakeProcess.env.NODE_ENV = 'production';
+  const r = await route.POST(post(req()));
+  assert.equal(r.status, 403);
+  assert.equal(calls, 2);
+});
+process.on('exit', () => rmSync(tmp, { recursive: true, force: true }));

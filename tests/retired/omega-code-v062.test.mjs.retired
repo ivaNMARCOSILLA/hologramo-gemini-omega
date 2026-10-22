@@ -1,0 +1,46 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const ts = require('typescript');
+const transpile = s => ts.transpileModule(s, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+function load(code, loader, fetchImpl, env) {
+  const mod = { exports: {} };
+  new Function('require', 'module', 'exports', 'process', 'fetch', code)(loader, mod, mod.exports, { env }, fetchImpl);
+  return mod.exports;
+}
+const lib = load(transpile(readFileSync(join(process.cwd(),'lib/omega-code-v062.ts'),'utf8')), require, () => { throw new Error('not called'); }, {});
+const marketText = transpile(readFileSync(join(process.cwd(),'lib/omega-market-v06.ts'),'utf8'));
+const codeText = transpile(readFileSync(join(process.cwd(),'app/api/omega-code/route.ts'),'utf8'));
+const heads = { host:'127.0.0.1:3000', origin:'http://127.0.0.1:3000', 'content-type':'application/json', 'sec-fetch-site':'same-origin' };
+const request = (data, extra = {}) => new Request('http://127.0.0.1:3000/api/omega-code', { method:'POST', headers:{...heads,...extra}, body:JSON.stringify(data) });
+const data = { language:'powershell', prompt:'Muestra una lista de los procesos en Windows sin modificarlos' };
+const env = { NODE_ENV:'development', OLLAMA_MODEL:'llama3.1:8b' };
+let calls = 0;
+const fakeFetch = async (url, options) => { calls++; assert.equal(url, 'http://127.0.0.1:11434/api/chat'); assert.equal(options.method,'POST'); assert.equal(JSON.parse(options.body).model,'llama3.1:8b'); return Response.json({ message: { content: '```powershell\nGet-Process\n```' } }); };
+const build = (opts = env) => {
+  const market = load(marketText, require, fakeFetch, opts);
+  return load(codeText, name => name === '@/lib/omega-code-v062' ? lib : name === '@/lib/omega-market-v06' ? market : require(name), fakeFetch, opts);
+};
+test('conserva solo endpoints Ollama en loopback', () => {
+  assert.equal(lib.localOllamaEndpoint('http://127.0.0.1:11434'), 'http://127.0.0.1:11434');
+  assert.equal(lib.localOllamaEndpoint('https://servidor.example'), null);
+  assert.equal(lib.localOllamaEndpoint('http://127.0.0.1:11434/path'), null);
+  assert.equal(lib.localOllamaEndpoint('http://usuario:clave@localhost:11434'), null);
+});
+test('solo cinco lenguajes permitidos', () => { assert.equal(lib.validCodeLanguage('powershell'),true); assert.equal(lib.validCodeLanguage('sh'),false); });
+test('solo devuelve código, sin ejecutar', async () => {
+  const r = await build().POST(request(data)); const result = await r.json();
+  assert.equal(r.status,200); assert.equal(result.code,'Get-Process'); assert.equal(result.executed,false); assert.equal(calls,1);
+});
+test('el navegador extranjero recibe 403 sin contactar Ollama', async () => {
+  const r = await build().POST(request(data,{origin:'https://example.org'})); assert.equal(r.status,403); assert.equal(calls,1);
+});
+test('lenguaje inesperado rechazado sin contactar Ollama', async () => {
+  const r = await build().POST(request({...data, language:'system'})); assert.equal(r.status,400); assert.equal(calls,1);
+});
+test('entorno de producción bloqueado', async () => {
+  const r = await build({...env, NODE_ENV:'production'}).POST(request(data)); assert.equal(r.status,403); assert.equal(calls,1);
+});

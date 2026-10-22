@@ -1,0 +1,86 @@
+/* OMEGA UI Futurista v1 - capa SOLO VISUAL y aditiva.
+   GARANTÍA: no cambia posiciones, tamaños, márgenes, tipografía ni textos de la interfaz existente.
+   Solo usa color de borde, sombras, brillo de texto y una capa decorativa fija (.omega-fx,
+   aria-hidden y sin eventos de puntero). Sin backdrop-filter ni filtros sobre el canvas 3D.
+   Se desactiva con Alto contraste, con colores forzados o desde el menú de Accesibilidad. */
+html[data-omega-ui="futurista"] {
+  --fx-cyan: #00e5ff;
+  --fx-violet: #8a5cff;
+  --fx-magenta: #ff3df2;
+  accent-color: var(--fx-cyan);
+  scrollbar-color: rgba(0, 229, 255, 0.55) rgba(2, 6, 16, 0.6);
+}
+html[data-omega-ui="futurista"] ::selection { background: rgba(0, 229, 255, 0.35); color: #fff; }
+
+/* Controles */
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is(button, [role="button"], [role="tab"], [role="menuitem"], summary) {
+  border-color: rgba(0, 229, 255, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.22), inset 0 0 14px rgba(0, 229, 255, 0.1), 0 0 12px rgba(0, 229, 255, 0.22);
+  text-shadow: 0 0 6px rgba(0, 229, 255, 0.55);
+}
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is(button, [role="button"], [role="tab"], [role="menuitem"], summary):hover:not(:disabled) {
+  border-color: var(--fx-cyan);
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.45), inset 0 0 18px rgba(0, 229, 255, 0.18), 0 0 20px rgba(0, 229, 255, 0.45);
+}
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is([aria-selected="true"], [aria-pressed="true"], [aria-current="page"], [aria-current="true"]) {
+  border-color: var(--fx-magenta);
+  box-shadow: inset 0 0 0 1px rgba(255, 61, 242, 0.45), 0 0 18px rgba(255, 61, 242, 0.4), 0 0 36px rgba(138, 92, 255, 0.3);
+}
+
+/* Campos */
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
+  border-color: rgba(0, 229, 255, 0.55);
+  box-shadow: inset 0 0 12px rgba(0, 229, 255, 0.12), 0 0 10px rgba(0, 229, 255, 0.15);
+  caret-color: var(--fx-cyan);
+}
+
+/* Paneles */
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is(aside, nav, dialog, details, fieldset, [role="dialog"], [role="region"], [role="tabpanel"], [role="toolbar"]) {
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.22), inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 26px rgba(0, 229, 255, 0.12);
+}
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is(h1, h2, h3) {
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.55), 0 0 24px rgba(138, 92, 255, 0.35);
+}
+
+/* Componentes OMEGA a11y */
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) .omega-a11y-btn {
+  background-image: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(138, 92, 255, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.35), 0 0 22px rgba(0, 229, 255, 0.45), 0 0 44px rgba(138, 92, 255, 0.25);
+}
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) :is(.omega-a11y-list, .omega-supervisor) {
+  background-image: linear-gradient(160deg, rgba(0, 229, 255, 0.07), rgba(138, 92, 255, 0.06) 60%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.25), 0 0 30px rgba(0, 229, 255, 0.25), 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) .omega-caption {
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.3);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+/* Capa decorativa HUD (nueva, independiente del diseño existente) */
+.omega-fx { display: none; }
+html[data-omega-ui="futurista"]:not([data-omega-contrast="alto"]) .omega-fx {
+  display: block; position: fixed; inset: 0; z-index: 9990; pointer-events: none; overflow: hidden; contain: strict;
+}
+.omega-fx__grid {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 58%, rgba(0, 8, 20, 0.32) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 229, 255, 0.03) 0 1px, transparent 1px 3px);
+}
+.omega-fx__scan {
+  position: absolute; left: 0; right: 0; top: 0; height: 18vh;
+  background: linear-gradient(to bottom, transparent, rgba(0, 229, 255, 0.07) 50%, transparent);
+  transform: translate3d(0, -20vh, 0); animation: omega-fx-scan 9s linear infinite; will-change: transform;
+}
+@keyframes omega-fx-scan { to { transform: translate3d(0, 120vh, 0); } }
+.omega-fx__c {
+  position: absolute; width: 36px; height: 36px; border: 0 solid rgba(0, 229, 255, 0.75);
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.8));
+}
+.omega-fx__c--tl { top: 10px; left: 10px; border-top-width: 2px; border-left-width: 2px; }
+.omega-fx__c--tr { top: 10px; right: 10px; border-top-width: 2px; border-right-width: 2px; }
+.omega-fx__c--bl { bottom: 10px; left: 10px; border-bottom-width: 2px; border-left-width: 2px; }
+.omega-fx__c--br { bottom: 10px; right: 10px; border-bottom-width: 2px; border-right-width: 2px; }
+html[data-omega-motion="reducido"] .omega-fx__scan { display: none; }
+@media (prefers-reduced-motion: reduce) { .omega-fx__scan { display: none; } }
+@media (forced-colors: active) { .omega-fx { display: none !important; } }

@@ -1,0 +1,87 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+omega-windows-agent/.agent-token
+
+omega-agent-v0.3/.agent-token
+omega-agent-v0.3/*.log
+.omega-backups/
+
+omega-local-data/
+.env.local
+# OMEGA VERCEL RC v1.2: archivos privados NO publicables
+omega-agent-v0.3/
+omega-agent-node/
+omega-windows-agent/
+omega-windows-agent-node-v0.1/
+omega-agent-v0.2/
+*.zip
+*.bak
+*.backup-*
+*.log
+.agent-token
+node_modules/
+.next/
+.vercel/
+.vercel
+.env*
+omega-agent-v0.3/.omega-bridge-secret
+omega-agent-v0.3/.omega-trusted-session.json
+
+# OMEGA bridge v0.3.1
+omega-agent-v0.3/logs/
+omega-agent-v0.3/.omega-bridge.lock
+
+# OMEGA secretos y locales
+.env*.local
+.env.local.backup*
+.venv-whisper/
+
+# OMEGA volcados, respaldos y archivos con claves
+Nueva carpeta/
+*proyecto_completo*.txt
+omega-operator-v*/respaldos/
+omega-operator-v*/diagnosticos/
+!*.example
+Nueva carpeta/PARTES/parte_022.txt
+OMEGA-v09-ENV-EJEMPLO.txt
+Nueva carpeta/PARTES/parte_001.txt

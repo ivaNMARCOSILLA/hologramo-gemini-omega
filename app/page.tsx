@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import HologramScene from "@/components/HologramScene";
 import OmegaUnifiedPanel from "@/components/OmegaUnifiedPanel";
 import { routeOmegaCommand } from "@/lib/omega-command-v11"; // OMEGA_VOICE_TOTAL_V11
+import { routeVoiceShortcut } from "@/lib/omega-av-v07"; // OMEGA_VOZ_DICTADORA_V1
 import "./omega-v05.css";
 import "./omega-v09.css";
 import OmegaScreen, { type OmegaScreenHandle } from "@/components/OmegaScreen";
@@ -326,8 +327,16 @@ export default function Home() {
               windowsDictationRef.current = false;
               window.dispatchEvent(new CustomEvent('omega:voice-order', { detail: transcript }));
             } else {
-              const instruction = routeOmegaCommand(transcript) || { kind:'ai_draft', text:transcript };
-              window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction, via:'voice' } }));
+              // OMEGA_VOZ_DICTADORA_V1: la voz manda. 1) intérprete v1.1; 2) si no reconoce la orden,
+              // atajo v0.7 (abrir sección / guardar idea, con confirmación hablada); 3) solo entonces, la IA.
+              const routed = routeOmegaCommand(transcript);
+              const shortcut = routed ? null : routeVoiceShortcut(transcript);
+              if (shortcut) {
+                window.dispatchEvent(new CustomEvent('omega:av-command', { detail: shortcut }));
+              } else {
+                const instruction = routed || { kind:'ai_draft', text:transcript };
+                window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction, via:'voice' } }));
+              }
             }
             try { recognition.stop(); } catch {}
             break;

@@ -11,7 +11,7 @@ import {
 import { routeOmegaIntent } from "@/lib/omega-router-v05";
 import type { OmegaPlan } from "@/lib/omega-router-v05";
 import catalogue from "@/data/omega-recetas-v05.json";
-import type { OmegaAVCommand } from "@/lib/omega-av-v07";
+import { routeVoiceShortcut, type OmegaAVCommand } from "@/lib/omega-av-v07";
 import { routeOmegaCommand, OMEGA_VOICE_EXAMPLES, type OmegaCommand } from "@/lib/omega-command-v11"; // OMEGA_VOICE_TOTAL_V11
 import OmegaV09CommandStrip from "@/components/OmegaV09CommandStrip";
 import OmegaV09Account from "@/components/OmegaV09Account";
@@ -211,8 +211,16 @@ export default function OmegaUnifiedPanel({
 
   // OMEGA_VOICE_TOTAL_V11: la entrada escrita pasa por el mismo interprete que la voz.
   const issueText = useCallback((text: string) => {
-    const instruction = routeOmegaCommand(text) || { kind:'ai_draft', text };
-    window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction, via:'text' } }));
+    // OMEGA_VOZ_DICTADORA_V1: la voz manda. 1) intérprete v1.1; 2) si no reconoce la orden,
+    // atajo v0.7 (abrir sección / guardar idea, con confirmación hablada); 3) solo entonces, la IA.
+    const routed = routeOmegaCommand(text);
+    const shortcut = routed ? null : routeVoiceShortcut(text);
+    if (shortcut) {
+      window.dispatchEvent(new CustomEvent('omega:av-command', { detail: shortcut }));
+    } else {
+      const instruction = routed || { kind:'ai_draft', text:text };
+      window.dispatchEvent(new CustomEvent('omega:unified-command', { detail:{ instruction, via:'text' } }));
+    }
   }, []);
   const switchSafeOpen = useCallback(async (enabled: boolean) => {
     if (localhost !== true) return;

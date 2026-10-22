@@ -308,6 +308,19 @@ export default function OmegaUnifiedPanel({
     return () => window.removeEventListener("omega:voice-order", onVoice);
   }, [writeLog, openVisibleWindowsApp]);
 
+  // OMEGA_CANCELAR_VOZ_V1: mismo efecto que el botón Cancelar (no ejecuta nada).
+  useEffect(() => {
+    const onCancel = () => {
+      setPlan(null);
+      setFeedback("Orden cancelada por voz. No se ha ejecutado nada. Si hay una ventana de permiso en Windows, pulsa Esc allí.");
+      setAvMessage("Orden cancelada.");
+      writeLog("Orden cancelada por voz");
+      window.dispatchEvent(new CustomEvent("omega:voice-summary", { detail: "Orden cancelada." }));
+    };
+    window.addEventListener("omega:voice-cancel", onCancel);
+    return () => window.removeEventListener("omega:voice-cancel", onCancel);
+  }, [writeLog]);
+
   function prepare(text = command) {
     const result = routeOmegaIntent(text);
     setCommand(text);

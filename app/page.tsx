@@ -327,7 +327,13 @@ export default function Home() {
             setLastUserVoice(transcript);
             // OMEGA_VOICE_TOTAL_V11: voz y texto usan el MISMO interprete local.
             // El microfono especializado sigue siendo dictado literal, no ejecuta ordenes.
-            if (editorDictationRef.current) {
+            // OMEGA_CANCELAR_VOZ_V1: «cancelar», «cerrar», «anular» o «no» como frase completa CANCELAN. Nunca aprueban.
+            if (/^(?:oye\s+)?(?:omega\s+)?(?:cancelar?|cancela|cerrar?|cierra|anular?|anula|no)$/i.test(transcript.replace(/[.,;:!?¡¿]+/g, '').trim())) {
+              editorDictationRef.current = false;
+              codeDictationRef.current = false;
+              windowsDictationRef.current = false;
+              window.dispatchEvent(new CustomEvent('omega:voice-cancel'));
+            } else if (editorDictationRef.current) {
               editorDictationRef.current = false;
               window.dispatchEvent(new CustomEvent('omega:voice-editor', { detail: transcript }));
             } else if (codeDictationRef.current) {
